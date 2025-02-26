@@ -8,7 +8,7 @@ def get_key(d, value):
 
 def my_translator():
     list_ = googletrans.LANGUAGES
-    d = {}
+    d = { }
     for index, i in enumerate(list_):
         print(f"{index+1}) {list_[i].title()}")
         d[str(index+1)] = list_[i].title()
