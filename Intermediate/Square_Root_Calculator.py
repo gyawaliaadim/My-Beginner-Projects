@@ -1,131 +1,94 @@
 '''
 Made By: Aadim Gyawali
-Publish : 1/16/2023
-Date
+Publish Date: 1/16/2023
 '''
+
 import sys
+
 sys.set_int_max_str_digits(999999999)
-def make_pairs(string):
-    result = []
-    if len(string) % 2 != 0:
-        result.append(string[0])
-        string = string[1:]
-    for i in range(0, len(string), 2):
-        result.append(string[i:i + 2])
-    return result
-def div(value, side_num):
-    z = 0
-    while (side_num + z) * z <= value:
-        z = z + 1
-    z = z - 1
-    return side_num + z, z
-def max_square_subtraction(num):
+
+def pair(input_str):
+    paired_array = []
+    for i in range(0, len(input_str), 2):
+        if i + 1 < len(input_str):
+            paired_array.append(input_str[i:i + 2])
+    return paired_array
+
+def make_pairs(input_str):
+    paired_array = []
+    if '.' in input_str:
+        int_part, frac_part = input_str.split('.')
+        if len(int_part) % 2 == 1:
+            int_part = '0' + int_part
+        if len(frac_part) % 2 == 1:
+            frac_part = frac_part + '0'
+        paired_array.extend(pair(int_part))
+        paired_array.append('.')
+        paired_array.extend(pair(frac_part))
+    else:
+        if len(input_str) % 2 == 1:
+            input_str = '0' + input_str
+        paired_array = pair(input_str)
+    return paired_array
+
+def calculation(num, side_num, index):
     num = int(num)
-    if num!=0:
-        square_number = closest_qrt(num)
+    side_num = int(side_num)
+    index = int(index)
+    if index == 0:
+        sq_num = 0
+        while sq_num * sq_num <= num:
+            sq_num += 1
+        sq_num -= 1
+        side_num = int(str(sq_num + sq_num) + "0")
+        sub_value = num - (sq_num * sq_num)
+        return side_num, sub_value, sq_num
     else:
-        square_number=0
-    side_num = (square_number + square_number) * 10
-    sub_value = num - square_number**2
-    return side_num, sub_value, square_number
-def closest_qrt(n):
-    x = n
-    y = (x + n // x) // 2
-    while y < x:
-        x = y
-        y = (x + n // x) // 2
-    return x
+        sq_num = 0
+        while (side_num + sq_num) * sq_num <= num:
+            sq_num += 1
+        sq_num -= 1
+        sub_value = num - ((side_num + sq_num) * sq_num)
+        side_num = int(str((side_num + sq_num) + sq_num) + '0')
+        return side_num, sub_value, sq_num
 
-
-def main():
-
-    try:
-        inp = float(input("Enter a number: "))
-    except:
-        print(f'''ValueError: invalid literal for number. ''')
-        main()
-    if str(inp).split(".")[1]=="0":
-        inp=int(str(inp).split(".")[0])
-    else:
-        num1=int(str(inp).split(".")[0])
-        num2=str(inp).split(".")[1]
-        if len(num2)%2!=0:
-            num2=int(num2)*10
-    if type(inp)==float:
-        list_of_numbers = make_pairs(str(num1))
-        list_of_numbers2= make_pairs(str(num2))
-        list_of_numbers.extend(".")
-        list_of_numbers.extend(list_of_numbers2)
-    else:
-        list_of_numbers = make_pairs(str(inp))
-        ex=list_of_numbers
-    first = list_of_numbers.pop(0)
-    side_num, sub_value, final = max_square_subtraction(first)
-    i=0
-    deci=1
-    if type(inp)==float:
+def user_input(msg):
+    while True:
         try:
-            deci=int(input("Enter a No of Decimals: "))
-        except:
-            print(f'''ValueError: invalid literal for number.''')
-            main()
-        if deci > 100:
-            print(f'''ValueError: Exceeds the limit (100) for integer.''')
-            main()
-    a=False
-    dot=False
-    while len(list_of_numbers) != 0 and i!=deci:
-        first = list_of_numbers.pop(0)
-        if first==".":
-            final=str(final)+"."
-            dot=True
-            a=True
-            continue
-        value = int((str(sub_value) + str(first)))
-        side_num, final1 = div(value, side_num)
-        final = (str(final) + str(final1))
-        sub_value = value - side_num * final1
-        side_num = (side_num + final1) * 10
-        if dot==True:
-            i=i+1
-    if sub_value!=0:
-        if type(inp)==int:
-            try:
-                deci=int(input("Enter Quantity Of Decimals: "))
-            except:
-                print("ValueError: invalid literal for number.")
-                main()
-            if deci <0:
-                print("ValueError: Exceeds the limit (100) for integer.")
-                main()
-        while i != deci: 
-            if sub_value != 0:
-                value = int(str(sub_value) + str("00"))
-                side_num, final1 = div(value, side_num)
-            if a==False:
-                final = (str(final) + "." + str(final1))
-                a = True
-            elif a==True:
-                final=(str(final)+(str(final1)))
-            else:
-                final = (str(final) + str(final1))
-            sub_value = value - side_num * final1
-            side_num = (side_num + final1) * 10
-            i = i + 1
+            inp = float(input(msg))
+            return inp
+        except ValueError:
+            print("Please enter a valid input.")
 
-    print(f"The square root of {inp} is {final}")
-    ask=2
-    while ask!=1:
-        ask=input("Do you want to continue(y/n): ")
-        if ask.lower()=="y":
-            main()
-            ask=1
-        elif ask.lower()=="n":
-            print("Thank you for using!")
-            exit()
-            ask=1
+def main(inp, decimal_points):
+    list_of_numbers = make_pairs(str(inp))
+    part = "int"
+    side_num = 0
+    sub_value = 0
+    final = ""
+    sq_num = 0
+    for index, pair in enumerate(list_of_numbers):
+        if index == 0:
+            num = pair
         else:
-            print(f'ValueError: "{ask}" not defined')
-            ask=2
+            num = str(sub_value) + pair
+        if (len(list_of_numbers) == index + 1 and part == "int") or pair == ".":
+            final += "."
+            number_of_pairs_after_decimal_point = len(list_of_numbers[list_of_numbers.index(".") + 1:])
+            total_decimal_points = decimal_points - number_of_pairs_after_decimal_point
+            part = "frac"
+            if pair == ".":
+                continue
+        if part == "frac" and total_decimal_points > 0:
+            list_of_numbers.append("00")
+            total_decimal_points -= 1
 
-main()
+        side_num, sub_value, sq_num = calculation(num, side_num, index)
+        final += str(sq_num)
+    return(final)
+    # print(f"The square root of {inp} is approximately {final}")
+
+if __name__ == '__main__':
+    input_value = (user_input("Enter the number to find the square root of: "))
+    decimal_points = int(user_input("Enter the number of decimal points: "))
+    print(main(input_value, decimal_points))
